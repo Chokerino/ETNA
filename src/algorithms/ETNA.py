@@ -17,7 +17,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from sklearn import metrics
+import inspect
 
+class extract_tensor(nn.Module):
+    def forward(self,x):
+        print(x.shape)
+        # Output shape (batch, features, hidden)
+        #tensor, _ = x
+        # Reshape shape (batch, hidden)
+        return x.squeeze(1)
 
 class Trainer(nn.Module):
 
@@ -28,6 +36,10 @@ class Trainer(nn.Module):
     def fit(self):
         pass
 
+def lowest_factor(n):
+    for num in range(2,n):
+        if n % num == 0:
+            return n
 
 class EmbeddingModel(torch.nn.Module):
     """network embedding model
@@ -68,18 +80,22 @@ class EmbeddingModel(torch.nn.Module):
 
         encoder = []
         dims = [input_dim] + hidden_layers
+        encoder_layer = nn.TransformerEncoderLayer(d_model=input_dim, nhead=lowest_factor(input_dim))
+        encoder.append(nn.TransformerEncoder(encoder_layer, num_layers=2))
         for i in range(len(dims) - 1):
-            encoder.append(nn.Linear(dims[i], dims[i + 1]))
+            encoder.append(nn.Linear(dims[i], dims[i + 1], bias = False))
             encoder.append(nn.BatchNorm1d(dims[i + 1])),
             encoder.append(nn.LeakyReLU(0.1))
         self.encoder = torch.nn.Sequential(*encoder)
-
         self.encoder.apply(self.init_weights)
 
         decoder = []
+        #decoder_layer = nn.TransformerDecoderLayer(d_model=dims[-1], nhead=lowest_factor(dims[-1]))
+        #decoder.append(nn.TransformerDecoder(decoder_layer, num_layers=2))
         for i in range(len(dims) - 1, 1, -1):
+            decoder.append(extract_tensor())
             decoder.append(nn.Linear(
-                dims[i], dims[i - 1]))
+                dims[i], dims[i - 1], bias = False))
             decoder.append(nn.BatchNorm1d(dims[i - 1]))
             decoder.append(nn.LeakyReLU(0.1))
         decoder.append(torch.nn.Linear(dims[1], dims[0]))
@@ -126,9 +142,11 @@ class EmbeddingModel(torch.nn.Module):
         loss_norm : torch.Tensor
             embedding norm loss
         '''
-        Z = self.encoder(X)
-
-        X_hat = self.decoder(Z)
+        #print(X.shape, A.shape)
+        Z = self.encoder(X.unsqueeze(1))
+        
+        print(inspect.getargspec(self.decoder))
+        X_hat = self.decoder(Z.unsqueeze(1))
 
         loss_2nd = F.binary_cross_entropy_with_logits(
             X_hat, X, reduction='none')

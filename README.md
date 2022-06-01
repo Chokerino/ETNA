@@ -1,5 +1,7 @@
 # ETNA: Embeddings to Network Alignment
 
+The results can be reproduced by running [this](https://github.com/Chokerino/ETNA/blob/master/src/demo.ipynb). At the moment, I dont have any ideas on how to improve the algorithm or the model.
+
 This repository contains the scripts to run the ETNA method and corresponding analysis
 described in the Li et al. paper,
 _Joint embedding of biological networks for cross-species functional alignment_.
