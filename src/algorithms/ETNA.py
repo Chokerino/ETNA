@@ -80,22 +80,18 @@ class EmbeddingModel(torch.nn.Module):
 
         encoder = []
         dims = [input_dim] + hidden_layers
-        encoder_layer = nn.TransformerEncoderLayer(d_model=input_dim, nhead=lowest_factor(input_dim))
-        encoder.append(nn.TransformerEncoder(encoder_layer, num_layers=2))
+
         for i in range(len(dims) - 1):
-            encoder.append(nn.Linear(dims[i], dims[i + 1], bias = False))
+            encoder.append(nn.Linear(dims[i], dims[i + 1]))
             encoder.append(nn.BatchNorm1d(dims[i + 1])),
             encoder.append(nn.LeakyReLU(0.1))
         self.encoder = torch.nn.Sequential(*encoder)
         self.encoder.apply(self.init_weights)
 
         decoder = []
-        #decoder_layer = nn.TransformerDecoderLayer(d_model=dims[-1], nhead=lowest_factor(dims[-1]))
-        #decoder.append(nn.TransformerDecoder(decoder_layer, num_layers=2))
         for i in range(len(dims) - 1, 1, -1):
-            decoder.append(extract_tensor())
             decoder.append(nn.Linear(
-                dims[i], dims[i - 1], bias = False))
+                dims[i], dims[i - 1]))
             decoder.append(nn.BatchNorm1d(dims[i - 1]))
             decoder.append(nn.LeakyReLU(0.1))
         decoder.append(torch.nn.Linear(dims[1], dims[0]))
@@ -143,10 +139,9 @@ class EmbeddingModel(torch.nn.Module):
             embedding norm loss
         '''
         #print(X.shape, A.shape)
-        Z = self.encoder(X.unsqueeze(1))
+        Z = self.encoder(X)
         
-        print(inspect.getargspec(self.decoder))
-        X_hat = self.decoder(Z.unsqueeze(1))
+        X_hat = self.decoder(Z)
 
         loss_2nd = F.binary_cross_entropy_with_logits(
             X_hat, X, reduction='none')

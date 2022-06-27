@@ -1,8 +1,8 @@
 # ETNA: Embeddings to Network Alignment
 
-The results can be reproduced by running [this](https://github.com/Chokerino/ETNA/blob/master/src/demo.ipynb). At the moment, I dont have any ideas on how to improve the algorithm or the model.
+The results can be reproduced by running [this](https://github.com/Chokerino/ETNA/blob/master/src/demo.ipynb). I experimented with using a transformer encoder and decoder but they seemed to perform worse and that makes sense because they are not really meant to work on such network data. Better embeddings could be generated if the NetMF/Deepwalk matrix can be understood but at the moment, I dont have any ideas on how to improve the algorithm or the model.
 
-<hr style="border:2px solid gray">
+<hr style="border:4px solid gray">
 
 
 This repository contains the scripts to run the ETNA method and corresponding analysis

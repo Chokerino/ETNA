@@ -180,5 +180,4 @@ def load_go_pairs(org1, org2, file_name):
     f = str(parent_dir) + '/data/' + org1 + '_' + org2 + '/' + file_name
     data = np.loadtxt(f, dtype=str, delimiter='\t')
     data = data[:, [0, 1]]
-    print(data.shape)
     return data
